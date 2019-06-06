@@ -91,8 +91,8 @@ User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
-.sync({ force: true })
-//.sync()
+//.sync({ force: true })
+.sync()
   .then(result => {
     User.findByPk(1);
     // console.log(result);

@@ -234,7 +234,14 @@ exports.postResetPw=(req,res,next)=>{
      return bcrypt.hash(pw,12);
     })
     .then(hashedPassword=>{
-
+      return User.update({
+        resetToken: nulll,
+        resetTokenExp: undefined,
+        password: hashedPassword
+      }, { where: { email: email } });
+    })
+    .then(result=>{
+      res.redirect("/login");
     })
     .catch((err) => {
       console.log(err);
