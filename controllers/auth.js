@@ -72,8 +72,14 @@ exports.postLogin = (req, res, next) => {
           return res.redirect("/login");
 
 
-      }).catch((err) => {
-        console.log(err);
+      }).catch(err => {
+        //console.log(err);
+        //res.redirect('/500');      
+
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+
       });
 
 
@@ -147,9 +153,15 @@ exports.postSignup = (req, res, next) => {
     res.redirect("/login"); 
 
   }) 
-  .catch((err) => {
-    console.log(err);
-  });  
+   .catch(err => {
+     //console.log(err);
+     //res.redirect('/500');      
+
+     const error = new Error(err);
+     error.httpStatusCode = 500;
+     return next(error);
+
+   }); 
   
 };
 
@@ -245,10 +257,15 @@ exports.getResetPw= (req, res, next) => {
 
      res.redirect("/login");
     
-   }).catch((err) => {
-     console.log(err);
-   });
+   }).catch(err => {
+     //console.log(err);
+     //res.redirect('/500');      
 
+     const error = new Error(err);
+     error.httpStatusCode = 500;
+     return next(error);
+
+   });
 
   
 };
@@ -284,7 +301,13 @@ exports.postResetPw=(req,res,next)=>{
     .then(result=>{
       res.redirect("/login");
     })
-    .catch((err) => {
-      console.log(err);
-    });
+      .catch(err => {
+        //console.log(err);
+        //res.redirect('/500');      
+
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+
+      });
 };
