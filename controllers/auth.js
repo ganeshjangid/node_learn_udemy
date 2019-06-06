@@ -46,7 +46,7 @@ exports.postLogin = (req, res, next) => {
             //return res.redirect("/");
           }
 
-          res.flash('error','Email Id or Password is invalid!');
+          req.flash('error','Email Id or Password is invalid!');
           return res.redirect("/login");
 
 
@@ -168,6 +168,7 @@ exports.postReset=(req,res,next)=>{
               const tokenUrl = "http://172.29.64.51:3058/newResetPassword/" + token;
               console.log(tokenUrl);
               //http://172.29.64.51:3058/newResetPassword/b5f0ddd1940bd041e822e85f52c3bb50b4c72d48fce7b438604eb22a8b7d4eb8
+              //http://localhost:3058/newResetPassword/d51618cf6b0ba72429056478a51120e03eb49990d8172d0e1d6264a457f1c6ad
               res.redirect("/login");
           })
           .catch((err) => {
@@ -234,11 +235,13 @@ exports.postResetPw=(req,res,next)=>{
      return bcrypt.hash(pw,12);
     })
     .then(hashedPassword=>{
+
+
       return User.update({
-        resetToken: nulll,
+        resetToken: null,
         resetTokenExp: undefined,
         password: hashedPassword
-      }, { where: { email: email } });
+      }, { where: { id: resetUser[0].id } });
     })
     .then(result=>{
       res.redirect("/login");

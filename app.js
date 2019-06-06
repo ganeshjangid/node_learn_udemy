@@ -96,7 +96,7 @@ sequelize
   .then(result => {
     User.findByPk(1);
     // console.log(result);
-    app.listen(3058);
+    app.listen(3059);
   })
 /*   .then(user => {
     if (!user) {
