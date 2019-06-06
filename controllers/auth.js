@@ -2,6 +2,8 @@ const crypto=require('crypto');
 
 const bcrypt=require('bcryptjs');
 
+const { validationResult }=require('express-validator/check');
+
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
@@ -73,6 +75,18 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const pw = req.body.password;
   const cPw = req.body.confirmPassword;
+
+  const error = validationResult(req);
+
+  console.log(error.array());
+  
+  if (!error.isEmpty()) {
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMsg: error.array()[0].msg
+    });
+  }
 
   //console.log(`${email} and ${pw} and ${cpw}`);
  User.findAll({
