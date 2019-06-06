@@ -10,7 +10,11 @@ exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    errorMsg:req.flash('error')
+    errorMsg:req.flash('error'),
+    outputError: {
+      email: ''
+    },
+    validationError:[]
   });
 };
 
@@ -18,13 +22,29 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    errorMsg: req.flash('error')
+    errorMsg: req.flash('error'),
+    outputError:{email:''},
+    validationError:[]
   });
 };
 
 exports.postLogin = (req, res, next) => {
   const email= req.body.email;
   const password=req.body.password;
+
+  const error = validationResult(req);
+
+    if (!error.isEmpty()) {
+      return res.status(422).render('auth/login', {
+        path: '/login',
+        pageTitle: 'Login',
+        errorMsg: error.array()[0].msg,
+        outputError: {
+          email: email
+        },
+        validationError:error.array()
+      });
+    }
 
   User.findAll({where:{email:email}})
   .then((user) => {
@@ -84,7 +104,11 @@ exports.postSignup = (req, res, next) => {
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
-      errorMsg: error.array()[0].msg
+      errorMsg: error.array()[0].msg,
+      outputError: {
+        email: email
+      },
+      validationError:error.array()
     });
   }
 

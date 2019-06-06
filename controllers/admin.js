@@ -1,11 +1,19 @@
 const Product = require('../models/product');
 
+const {
+  validationResult
+} = require('express-validator/check');
+
 exports.getAddProduct = (req, res, next) => {
 
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
-    editing: false
+    editing: false,
+    errorMsg:[],
+    errorotp:{title:'',imageUrl:''},
+    hasError:false,
+
   });
 };
 
@@ -14,6 +22,31 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
+
+  const error = validationResult(req);
+
+  if (!error.isEmpty()) {
+    console.log(error.array());
+  
+    return res.render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      errorMsg:error.array()[0].msg,
+      errorotp: {
+        title: title,
+        imageUrl: imageUrl
+      },
+      hasError:true,
+      product:{
+        title: title,
+          price: price,
+          imageUrl: imageUrl,
+          description: description
+      }
+    });
+  }
+
   req.user
     .createProduct({
       title: title,
@@ -49,7 +82,9 @@ exports.getEditProduct = (req, res, next) => {
         pageTitle: 'Edit Product',
         path: '/admin/edit-product',
         editing: editMode,
-        product: product
+        product: product,
+        errorMsg:[],
+        validationError: []
       });
     })
     .catch(err => console.log(err));
@@ -61,10 +96,32 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
+
+  const error = validationResult(req);
+
+  if (!error.isEmpty()) {
+    //console.log(error.array());
+
+    return res.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      editing: true,
+      errorMsg: error.array()[0].msg,
+      hasError: true,
+      product: {
+        title: updatedTitle,
+        price: updatedPrice,
+        imageUrl: updatedImageUrl,
+        description: updatedDesc,
+        id: prodId
+      },
+      validationError: error.array()
+    });
+  }
   Product.findByPk(prodId)
     .then(product => {
-
-      if (product.id !== prodId) {
+      
+      if (product.id.toString() !== prodId.toString()) {
         return res.redirect("/");
       }
 
@@ -76,7 +133,7 @@ exports.postEditProduct = (req, res, next) => {
         .then(result => {
           console.log('UPDATED PRODUCT!');
           res.redirect('/admin/products');
-        })
+        });
     })
     
     .catch(err => console.log(err));
@@ -102,14 +159,19 @@ exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findByPk(prodId)
     .then(product => {
-      if (product.id !== prodId) {
+      //console.log(product.id);
+      //console.log(prodId);
+
+      ///return false;
+      
+      if (product.id.toString() !== prodId.toString()) {
         return res.redirect("/");
       }
       return product.destroy()
         .then(result => {
           console.log('DESTROYED PRODUCT');
           res.redirect('/admin/products');
-        })
+        });
     })
     .catch(err => console.log(err));
 };
